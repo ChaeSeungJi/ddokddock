@@ -10,11 +10,12 @@ router.get("/", function (req, res) {
 // login-post
 router.post("/", function (req, res) {
   console.log(req.body); // form-data로 받아올 때는 빈 값이 받아오고, json으로 받아야 제대로 받아옴
-  var loginid = req.body.loginid;
+  var login_id = req.body.loginid;
   var password = req.body.password;
 
+  console.log(login_id);
   var sql = "select * from member where login_id = ? and password = ?";
-  var params = [loginid, password];
+  var params = [login_id, password];
 
   db.query(sql, params, function (error, results) {
     if (error) {
@@ -31,7 +32,7 @@ router.post("/", function (req, res) {
 
 // 회원가입 페이지 /login/sign-up
 router.post("/sign-up", function (req, res) {
-  var login_id = req.body.login_id;
+  var login_id = req.body.loginid;
   var password = req.body.password;
   var nickname = req.body.nickname;
 
