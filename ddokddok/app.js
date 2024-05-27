@@ -27,10 +27,9 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/login", loginRouter);
 app.use("/search", searchRouter);
-app.use("/tag", tagRouter); // localhost:3000/tag
+app.use("/tag", tagRouter); // localhost:3000/tag 
 app.use("/list", listRouter);
 
-// catch 404 and forward to error handler
 app.use(function (req, res, next) {
   console.log('404 Error: ', req.url);
   next(createError(404));
