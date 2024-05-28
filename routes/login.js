@@ -23,11 +23,20 @@ router.post("/", function (req, res) {
     if (results.length > 0) {
       res.send(results);
       req.session.member_id = results[0].member_id;
-      console.log(req.session.member_id);
       req.session.save(); // save를 해줘야 세션에 저장됨.
     } else {
       res.send("로그인 실패");
     }
+  });
+});
+
+router.get("/loggout", function (req, res) {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).send("Failed to log out");
+    }
+    res.clearCookie("connect.sid"); // 세션 쿠키 제거
+    res.send("Logged out");
   });
 });
 
