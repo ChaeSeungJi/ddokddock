@@ -1,7 +1,7 @@
 // express 모듈과 라우터 설정
 const express = require("express");
 const router = express.Router();
-const db = require("../util/db");
+const db = require("../../util/db");
 
 // study 생성 함수
 function createStudy(title, content, leader_id, callback) {
