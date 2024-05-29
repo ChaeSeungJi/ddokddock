@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-var db = require("../util/db");
+var db = require("../../util/db");
 
 // /login-get? , 얘는 필요한가..?
 router.get("/", function (req, res) {
