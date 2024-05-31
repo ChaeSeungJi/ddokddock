@@ -10,10 +10,11 @@ var logger = require("morgan");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var loginRouter = require("./routes/member/login");
-var searchRouter = require("./routes/study/search");
 var tagRouter = require("./routes/study/tag");
 var listRouter = require("./routes/study/list");
 var studyRouter = require("./routes/study/study");
+var questionRouter = require("./routes/question/question");
+var questionLikesRouter = require("./routes/question/question_likes");
 
 var app = express();
 
@@ -43,10 +44,11 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/login", loginRouter);
-app.use("/study/search", searchRouter);
 app.use("/tag", tagRouter); // localhost:3000/tag
 app.use("/study/list", listRouter);
 app.use("/study", studyRouter);
+app.use("/question", questionRouter);
+app.use("/question/likes", questionLikesRouter);
 
 app.use(function (req, res, next) {
   console.log("404 Error: ", req.url);
