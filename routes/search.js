@@ -1,3 +1,4 @@
+//목록 검색 후 출력
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
@@ -9,8 +10,8 @@ router.get('/', (req, res) => {
   const { keyword, sort, page, perPage } = req.query; //페이징처리
   const offset = (page - 1) * perPage;
 
-  let query = `
-    SELECT s.study_id, s.title, s.content, m.nickname AS leader_nickname, s.created_at
+  let query = ` 
+    SELECT s.study_id, s.title, s.content, s.image_url, m.nickname AS leader_nickname, s.created_at
     FROM study s
     JOIN member m ON s.leader_id = m.member_id
   `;

@@ -10,6 +10,8 @@ var loginRouter = require("./routes/login");
 var searchRouter = require("./routes/search");
 var tagRouter = require("./routes/tag");
 var listRouter = require("./routes/list");
+var study_detail_list = require("./routes/study_detail_list");
+var chapter_list = require("./routes/chapter_list");
 
 var app = express();
 
@@ -29,6 +31,8 @@ app.use("/login", loginRouter);
 app.use("/search", searchRouter);
 app.use("/tag", tagRouter); // localhost:3000/tag 
 app.use("/list", listRouter);
+app.use("/study_detail_list", study_detail_list);
+app.use("/chapter_list", chapter_list);
 
 app.use(function (req, res, next) {
   console.log('404 Error: ', req.url);
