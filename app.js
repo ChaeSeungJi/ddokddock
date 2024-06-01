@@ -12,6 +12,8 @@ var usersRouter = require("./routes/users");
 var loginRouter = require("./routes/member/login");
 var tagRouter = require("./routes/study/tag");
 var listRouter = require("./routes/study/list");
+var detailRouter = require("./routes/study/detailList");
+var chapterRouter = require("./routes/study/chapterList");
 var studyRouter = require("./routes/study/study");
 var questionRouter = require("./routes/question/question");
 var questionLikesRouter = require("./routes/question/question_likes");
@@ -44,11 +46,14 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/login", loginRouter);
-app.use("/tag", tagRouter); // localhost:3000/tag
+app.use("/study/tag", tagRouter); // localhost:3000/tag
 app.use("/study/list", listRouter);
+app.use("/study/detailList", detailRouter);
+app.use("/study/chapterList", chapterRouter);
 app.use("/study", studyRouter);
 app.use("/question", questionRouter);
 app.use("/question/likes", questionLikesRouter);
+
 
 app.use(function (req, res, next) {
   console.log("404 Error: ", req.url);

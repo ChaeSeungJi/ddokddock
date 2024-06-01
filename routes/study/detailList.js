@@ -1,13 +1,12 @@
-//내용까지 추가된 스터디 다 가져오기
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
-const db = require('../util/db');
+const db = require('../../util/db');
 
-router.use(bodyParser.urlencoded({ extended: true }));
+router.use(express.urlencoded({ extended: true }));
 
-router.get('/:studyId', (req, res) => {
-  const studyId = req.params.studyId;
+router.get('/', (req, res) => {
+  const studyId = req.query.studyId;
   
   if (!studyId) {
     res.status(400).json({ error: '스터디 ID가 제공되지 않았습니다.' });

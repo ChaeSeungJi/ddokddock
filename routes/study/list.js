@@ -3,22 +3,40 @@ const router = express.Router();
 const db = require("../../util/db");
 
 router.get("/", (req, res) => {
-  const query = `
-    SELECT s.study_id, s.title, s.content, m.nickname AS leader_nickname, s.created_at
+  const { sort } = req.query;
+  let { page, perPage } = req.query;
+
+  if (!page) {
+    page = 1;
+  }
+  if (!perPage) {
+    perPage = 10;
+  }
+
+  // 페이징 처리
+  const offset = (page - 1) * perPage;
+
+  let query = `
+    SELECT s.study_id, s.title, SUBSTR(s.content, 1, 20) AS content, s.image_url, m.nickname AS leader_nickname, s.created_at
     FROM study s
     JOIN member m ON s.leader_id = m.member_id
-    ORDER BY s.created_at DESC
-    `;
+  `;
 
-  db.query(query, (error, results) => {
+  if (sort === 'latest') {
+    query += ` ORDER BY s.created_at DESC `;
+  } else {
+    query += ` ORDER BY s.created_at ASC `;
+  }
+
+  query += ` LIMIT ?, ? `;
+
+  db.query(query, [offset, parseInt(perPage)], (error, results) => {
     if (error) {
-      console.error("스터디 목록 조회 중 오류 발생: ", error);
-      res
-        .status(500)
-        .json({ error: "스터디 목록 조회중 오류가 발생했습니다. " });
+      console.error('스터디 목록 조회 중 오류 발생: ', error);
+      res.status(500).json({ error: '스터디 목록 조회 중 오류가 발생했습니다.' });
     } else {
       if (results.length === 0) {
-        res.status(404).json({ message: "스터디 목록이 비어 있습니다" });
+        res.status(404).json({ message: '스터디 목록이 비어 있습니다.' });
       } else {
         res.json(results);
       }
@@ -27,16 +45,29 @@ router.get("/", (req, res) => {
 });
 
 router.get("/search", (req, res) => {
-  const { keyword, sort, page, perPage } = req.query; //페이징처리
+  const { keyword, sort } = req.query;
+  let { page, perPage } = req.query;
+
+  if (!page) {
+    page = 1;
+  }
+  if (!perPage) {
+    perPage = 10;
+  }
+
   const offset = (page - 1) * perPage;
+
   let query = `
-    SELECT s.study_id, s.title, s.content, m.nickname AS leader_nickname, s.created_at
+    SELECT s.study_id, s.title, s.content, s.image_url, m.nickname AS leader_nickname, s.created_at
     FROM study s
     JOIN member m ON s.leader_id = m.member_id
   `;
 
+  const params = [];
+
   if (keyword) {
-    query += ` WHERE s.title LIKE '%${keyword}%' OR s.content LIKE '%${keyword}%' `;
+    query += ` WHERE s.title LIKE ? OR s.content LIKE ? `;
+    params.push(`%${keyword}%`, `%${keyword}%`);
   }
 
   if (sort === "latest") {
@@ -45,9 +76,10 @@ router.get("/search", (req, res) => {
     query += ` ORDER BY s.created_at ASC `;
   }
 
-  query += ` LIMIT ${offset}, ${perPage} `;
+  query += ` LIMIT ?, ? `;
+  params.push(offset, parseInt(perPage));
 
-  db.query(query, (error, results) => {
+  db.query(query, params, (error, results) => {
     if (error) {
       console.error("검색 중 오류 발생:", error);
       res.status(500).json({ error: "검색 중 오류가 발생했습니다." });

@@ -1,15 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
-const db = require('../util/db');
+const db = require('../../util/db');
 
-router.use(bodyParser.urlencoded({ extended: true }));
+router.use(express.urlencoded({ extended: true }));
 
-router.get('/:studyId', (req, res) => {
-  const studyId = req.params.studyId;
-  const { sort, page, perPage } = req.query;
+router.get('/', (req, res) => {
+  const { studyId, sort, page, perPage } = req.query;
 
-  // 페이징 처리
+  if (!page || !perPage) {
+    page = 1;
+    perPage = 10;
+  }
+
   const offset = (page - 1) * perPage;
 
   let query = `
