@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
   let { page, perPage } = req.query;
 
   if (!page || !perPage) {
-    page = 1;
+    page = 1; 
     perPage = 10;
   }
 

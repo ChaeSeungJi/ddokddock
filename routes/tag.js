@@ -5,14 +5,13 @@ const db = require('../util/db');
 
 router.use(express.urlencoded({ extended: true }));
 
-router.get('/:searchTag', (req, res) => {
-  const searchTag = req.params.searchTag;
-  let { sort, page, perPage } = req.query;
+router.get('/', (req, res) => {
+  const { keyword, sort, page, perPage } = req.query;
 
   if (!page || !perPage) {
     page = 1;
     perPage = 10;
-  } 
+  }
 
   const offset = (page - 1) * perPage;
 
@@ -22,10 +21,14 @@ router.get('/:searchTag', (req, res) => {
     JOIN member m ON s.leader_id = m.member_id
     JOIN study_tag st ON s.study_id = st.study_id
     JOIN tag t ON st.tag_id = t.tag_id
-    WHERE t.tag_name = ?
   `;
 
-  const params = [searchTag];
+  const params = [];
+
+  if (keyword) {
+    query += ` WHERE t.tag_name = ? `;
+    params.push(keyword);
+  }
 
   if (sort === 'latest') {
     query += ` ORDER BY s.created_at DESC `;
@@ -48,4 +51,3 @@ router.get('/:searchTag', (req, res) => {
 });
 
 module.exports = router;
-
