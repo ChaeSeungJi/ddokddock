@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-var db = require("../util/db");
+var db = require("../../util/db");
 
 // /login-get? , 얘는 필요한가..?
 router.get("/", function (req, res) {
@@ -9,11 +9,9 @@ router.get("/", function (req, res) {
 
 // login-post
 router.post("/", function (req, res) {
-  console.log(req.body); // form-data로 받아올 때는 빈 값이 받아오고, json으로 받아야 제대로 받아옴
   var login_id = req.body.loginid;
   var password = req.body.password;
 
-  console.log(login_id);
   var sql = "select * from member where login_id = ? and password = ?";
   var params = [login_id, password];
 
@@ -23,10 +21,22 @@ router.post("/", function (req, res) {
       return;
     }
     if (results.length > 0) {
-      res.send("로그인 성공");
+      res.send(results);
+      req.session.member_id = results[0].member_id;
+      req.session.save(); // save를 해줘야 세션에 저장됨.
     } else {
       res.send("로그인 실패");
     }
+  });
+});
+
+router.get("/loggout", function (req, res) {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).send("Failed to log out");
+    }
+    res.clearCookie("connect.sid"); // 세션 쿠키 제거
+    res.send("Logged out");
   });
 });
 
@@ -45,7 +55,7 @@ router.post("/sign-up", function (req, res) {
       return;
     } else {
       if (results.affectedRows > 0) {
-        res.send("회원가입 성공");
+        res.status(200).send("회원가입 성공");
       } else {
         res.status(400).send("회원가입 실패, 입력 데이터를 확인해주세요");
       }
