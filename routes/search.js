@@ -1,4 +1,3 @@
-//목록 검색 후 출력
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
@@ -7,7 +6,14 @@ const db = require('../util/db');
 router.use(bodyParser.urlencoded({ extended: true }));
 
 router.get('/', (req, res) => {
-  const { keyword, sort, page, perPage } = req.query; //페이징처리
+  const { keyword, sort } = req.query;
+  let { page, perPage } = req.query;
+
+  if (!page || !perPage) {
+    page = 1;
+    perPage = 10;
+  }
+
   const offset = (page - 1) * perPage;
 
   let query = ` 
@@ -16,8 +22,11 @@ router.get('/', (req, res) => {
     JOIN member m ON s.leader_id = m.member_id
   `;
 
+  const params = [];
+
   if (keyword) {
-    query += ` WHERE s.title LIKE '%${keyword}%' OR s.content LIKE '%${keyword}%' `;
+    query += ` WHERE s.title LIKE ? OR s.content LIKE ? `;
+    params.push(`%${keyword}%`, `%${keyword}%`);
   }
 
   if (sort === 'latest') {
@@ -26,9 +35,10 @@ router.get('/', (req, res) => {
     query += ` ORDER BY s.created_at ASC `;
   }
 
-  query += ` LIMIT ${offset}, ${perPage} `;
+  query += ` LIMIT ?, ? `;
+  params.push(offset, parseInt(perPage));
 
-  db.query(query, (error, results) => {
+  db.query(query, params, (error, results) => {
     if (error) {
       console.error('검색 중 오류 발생:', error);
       res.status(500).json({ error: '검색 중 오류가 발생했습니다.' });
@@ -37,7 +47,5 @@ router.get('/', (req, res) => {
     }
   });
 });
-
-
 
 module.exports = router;
