@@ -1,32 +1,50 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const db = require("../../util/db");
+const bodyParser = require('body-parser');
+const db = require('../../util/db');
 
 router.use(express.urlencoded({ extended: true }));
 
-// 태그 검색 요청 처리
-router.get("/", (req, res) => {
-  console.log("GET /tag route called");
-  // const searchTag = req.query.tag;
-  const searchTag = "백엔드";
-  console.log(`검색된 태그: ${searchTag}`);
-  const decodedSearchTag = decodeURIComponent(searchTag);
+router.get('/', (req, res) => {
+  const { keyword, sort, page, perPage } = req.query;
 
-  const query = `
-    SELECT s.study_id, s.title, s.content, m.nickname AS leader_nickname
+  if (!page || !perPage) {
+    page = 1;
+    perPage = 10;
+  }
+
+  const offset = (page - 1) * perPage;
+
+  let query = `
+    SELECT s.study_id, s.title, s.content, s.image_url, m.nickname AS leader_nickname, s.created_at
     FROM study s
     JOIN member m ON s.leader_id = m.member_id
     JOIN study_tag st ON s.study_id = st.study_id
     JOIN tag t ON st.tag_id = t.tag_id
-    WHERE t.tag_id = (SELECT tag_id FROM tag WHERE tag_name = ?)
   `;
 
-  db.query(query, [decodedSearchTag], (error, results) => {
+  const params = [];
+
+  if (keyword) {
+    query += ` WHERE t.tag_name = ? `;
+    params.push(keyword);
+  }
+
+  if (sort === 'latest') {
+    query += ` ORDER BY s.created_at DESC `;
+  } else {
+    query += ` ORDER BY s.created_at ASC `;
+  }
+
+  query += ` LIMIT ?, ? `;
+  params.push(offset, parseInt(perPage));
+
+  db.query(query, params, (error, results) => {
     if (error) {
-      console.error("태그 검색 중 오류 발생:", error);
-      res.status(500).json({ error: "태그 검색 중 오류가 발생했습니다." });
+      console.error('태그 검색 중 오류 발생:', error);
+      res.status(500).json({ error: '태그 검색 중 오류가 발생했습니다.' });
     } else {
-      console.log("검색 결과:", results);
+      console.log('검색 결과:', results);
       res.json(results);
     }
   });
