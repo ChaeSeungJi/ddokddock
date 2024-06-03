@@ -14,6 +14,7 @@ var tagRouter = require("./routes/study/tag");
 var listRouter = require("./routes/study/list");
 var detailRouter = require("./routes/study/detailList");
 var chapterRouter = require("./routes/study/chapterList");
+var commentRouter = require("./routes/study/study_question");
 var studyRouter = require("./routes/study/study");
 var questionRouter = require("./routes/question/question");
 var questionLikesRouter = require("./routes/question/question_likes");
@@ -50,6 +51,8 @@ app.use("/study/tag", tagRouter); // localhost:3000/tag
 app.use("/study/list", listRouter);
 app.use("/study/detailList", detailRouter);
 app.use("/study/chapterList", chapterRouter);
+app.use("/study/study_question", commentRouter);
+app.use("/study/study_", chapterRouter);
 app.use("/study", studyRouter);
 app.use("/question", questionRouter);
 app.use("/question/likes", questionLikesRouter);
