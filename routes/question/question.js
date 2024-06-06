@@ -82,6 +82,9 @@ router.get("/id/:questionId", function (req, res) {
   var sqlTags =
     "select t1.tag_id, t1.tag_name from tag t1 join study_tag t2 on t1.tag_id = t2.tag_id where t2.study_id = ?";
 
+  var sqlAnswers = `select a.answer_id, a.content, a.created_at, a.member_id, m.nickname 
+  from answer a 
+  join member m on a.member_id = m.member_id  where question_id = '${questionId}' `;
   db.query(sqlQuestion, questionId, function (error, questionResults) {
     if (error) {
       res.status(500).send("서버 오류 발생: " + error.message);
@@ -100,12 +103,19 @@ router.get("/id/:questionId", function (req, res) {
         return;
       }
 
-      const result = {
-        question: questionResults[0],
-        tags: tagResults,
-      };
+      db.query(sqlAnswers, function (error, answerResult) {
+        if (error) {
+          res.status(500).send("서버 오류 발생: " + error.message);
+          return;
+        }
+        const result = {
+          question: questionResults[0],
+          tags: tagResults,
+          answers: answerResult,
+        };
 
-      res.status(200).json(result);
+        return res.json(result);
+      });
     });
   });
 });
