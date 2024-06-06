@@ -14,6 +14,8 @@ var tagRouter = require("./routes/study/tag");
 var listRouter = require("./routes/study/list");
 var studyRouter = require("./routes/study/study");
 var questionRouter = require("./routes/question/question");
+var answerRouter = require("./routes/answer/answer");
+
 var questionLikesRouter = require("./routes/question/question_likes");
 
 var app = express();
@@ -49,6 +51,7 @@ app.use("/study/list", listRouter);
 app.use("/study", studyRouter);
 app.use("/question", questionRouter);
 app.use("/question/likes", questionLikesRouter);
+app.use("/answer", answerRouter);
 
 app.use(function (req, res, next) {
   console.log("404 Error: ", req.url);
