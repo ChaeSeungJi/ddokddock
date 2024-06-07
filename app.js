@@ -16,6 +16,8 @@ var detailRouter = require("./routes/study/detailList");
 var chapterRouter = require("./routes/study/chapterList");
 var studyRouter = require("./routes/study/study");
 var questionRouter = require("./routes/question/question");
+var answerRouter = require("./routes/answer/answer");
+
 var questionLikesRouter = require("./routes/question/question_likes");
 
 var app = express();
@@ -53,6 +55,7 @@ app.use("/study/chapterList", chapterRouter);
 app.use("/study", studyRouter);
 app.use("/question", questionRouter);
 app.use("/question/likes", questionLikesRouter);
+app.use("/answer", answerRouter);
 
 
 app.use(function (req, res, next) {
