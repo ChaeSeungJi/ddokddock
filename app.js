@@ -7,6 +7,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 
+
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var loginRouter = require("./routes/member/login");
@@ -15,7 +16,9 @@ var listRouter = require("./routes/study/list");
 var detailRouter = require("./routes/study/detailList");
 var chapterRouter = require("./routes/study/chapterList");
 var commentRouter = require("./routes/study/study_question");
+var showstudyRouter = require("./routes/mypage/show_study");
 var studyRouter = require("./routes/study/study");
+var noticeRouter = require("./routes/notice/notice");
 var questionRouter = require("./routes/question/question");
 var questionLikesRouter = require("./routes/question/question_likes");
 
@@ -54,6 +57,8 @@ app.use("/study/chapterList", chapterRouter);
 app.use("/study/study_question", commentRouter);
 app.use("/study/study_", chapterRouter);
 app.use("/study", studyRouter);
+app.use("/notice/notice", noticeRouter);
+app.use("/mypage/show_study", showstudyRouter);
 app.use("/question", questionRouter);
 app.use("/question/likes", questionLikesRouter);
 
