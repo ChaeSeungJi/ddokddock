@@ -1,0 +1,178 @@
+/* 기본 스타일 제거 */
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-family: 'Spoqa Han Sans Neo', 'sans-serif';
+    /* font-size: 16px; */
+}
+
+/* 배경 부분 */
+body {
+    border: 1px solid red;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* 회원가입 틀 부분 */
+main {
+    /* border: 1px solid red; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 23rem;
+    height: auto;
+    padding: 30px;
+}
+
+/* 로고 부분 */
+.logo {
+    /* border: 1px solid blue; */
+    width: 170px;
+    margin: 12px auto 30px;
+}
+
+/* 입력칸 틀 영역 */
+fieldset {
+    border: 1px solid green;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 10px;
+    padding: 10px 12px;
+}
+
+/* 입력칸 영역 */
+input {
+    border: 1px solid purple;
+    width: 15rem;
+}
+
+/* 회원가입 버튼 */
+button {
+    border: 1px solid purple;
+    cursor: pointer;
+    width: 16.3rem;
+    height: 3rem;
+}
+
+/* 배경 이미지 및 사이즈 */
+body {
+    background-image: url('../images/ex.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+/* 메인 부분 */
+main {
+    background: linear-gradient(124.47deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2));
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+/* hover 기능 투명했다가 커서 가져다 될 경우 배경 표시
+main {
+   
+     background: linear-gradient(
+        124.47deg,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0)
+    );  
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(0px); 
+}
+
+main:hover {
+    background: linear-gradient(124.47deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2));
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+} */
+
+fieldset {
+    border-radius: 50px;
+}
+
+fieldset:not(:last-of-type) {
+    background: linear-gradient(124.47deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2));
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+fieldset:not(:last-of-type):hover {
+    background: linear-gradient(
+        124.47deg,
+        rgba(255, 255, 255, 0.5),
+        rgba(255, 255, 255, 0.3),
+        rgba(255, 255, 255, 0.5)
+    );
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+input {
+    border: none;
+    background-color: transparent;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+input::placeholder {
+    color: rgb(255, 255, 255, 0.5);
+}
+
+input:focus {
+    outline: none;
+}
+
+.signup {
+    border: none;
+}
+
+/* 회원가입 버튼 css */
+button {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(124.47deg, rgba(61, 151, 215, 0.2), rgba(61, 151, 215, 0), rgba(61, 151, 215, 0.2));
+    backdrop-filter: blur(5px);
+}
+
+/* 회원가입 버튼 호버 */
+button:hover {
+    background: linear-gradient(124.47deg, rgba(61, 151, 215, 0.8), rgba(61, 151, 215, 0.6), rgba(61, 151, 215, 0.8));
+    top: 1px;
+    margin-top: 1px;
+}
+
+/* 회원가입 버튼 클릭시 움직임 */
+button:active {
+    position: relative;
+    top: 5px;
+    margin-top: 5px;
+}
+
+/* */
+main > div {
+    color: #ffffff;
+    font-size: 14px;
+    padding: 0px 30px 0px 30px;
+}
+
+/* 숨김*/
+.hide {
+    display: none;
+}

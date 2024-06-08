@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>회원가입</title>
+        <link rel="stylesheet" href="public/stylesheets/css/Sign.css">
+    </head>
+        <body>
+            <main>
+                <a href ="main.html"> <!-- 수정 필요 -->
+                <img class="logo" src="public/stylesheets/images/ddokddok-logo.png" alt="DDOKDDOK_LOGO" />
+                </a>
+
+                <fieldset>
+                    <input type="text" id="nickname" placeholder="닉네임" />
+                </fieldset>
+
+                <fieldset>
+                    <input type="text" id="username" placeholder="아이디" />
+                </fieldset>
+
+                <div class="success-message hide">사용할 수 있는 아이디입니다</div>
+                <div class="failure-message hide">아이디는 4~12글자이어야 합니다</div>
+                <div class="failure-message2 hide">영어 또는 숫자만 가능합니다</div>
+
+                <fieldset>
+                    <input type="password" id="password" placeholder="비밀번호" />
+                </fieldset>
+
+                <div class="strongPassword-message hide">8글자 이상, 영문, 숫자, 특수문자(@$!%*#?&)를 사용하세요</div>
+
+                <fieldset>
+                    <input type="password" id="password-retype" placeholder="비밀번호 확인" />
+                </fieldset>
+
+                <div class="mismatch-message hide">비밀번호가 일치하지 않습니다</div>
+                <!-- <div class="success-message hide">사용할 수 있는 비밀번호입니다</div> --> <!-- 미구현-->
+                
+
+                <fieldset class="signup">
+                    <button>회원가입</button>
+                </fieldset>
+
+                <script src="id-password-script.js"></script>
+            </main>
+        </body>
+    </head>
+</html>
