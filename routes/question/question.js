@@ -77,15 +77,21 @@ router.post("/delete", function (req, res) {
 
 // 단일 질문 불러오기
 router.get("/id/:questionId", function (req, res) {
-  var questionId = req.params.questionId;
-  var sqlQuestion = "select * from question where question_id = ?";
-  var sqlTags =
-    "select t1.tag_id, t1.tag_name from tag t1 join study_tag t2 on t1.tag_id = t2.tag_id where t2.study_id = ?";
+  const questionId = req.params.questionId;
+  const sqlQuestion = "SELECT * FROM question WHERE question_id = ?";
+  const sqlTags = "SELECT t1.tag_id, t1.tag_name FROM tag t1 JOIN study_tag t2 on t1.tag_id = t2.tag_id WHERE t2.study_id = ?";
+  const sqlAnswers = `SELECT a.answer_id, a.content, a.created_at, a.member_id, m.nickname 
+                      FROM answer a 
+                      JOIN member m ON a.member_id = m.member_id 
+                      WHERE a.question_id = ?`;
 
-  var sqlAnswers = `select a.answer_id, a.content, a.created_at, a.member_id, m.nickname 
-  from answer a 
-  join member m on a.member_id = m.member_id  where question_id = '${questionId}' `;
-  db.query(sqlQuestion, questionId, function (error, questionResults) {
+  const sqlComments = `SELECT ac.answer_comment_id, ac.answer_id, ac.member_id, ac.parent_comment_id, ac.content, ac.created_at, m.nickname 
+                       FROM answer_comment ac 
+                       JOIN member m ON ac.member_id = m.member_id 
+                       WHERE ac.answer_id IN (SELECT answer_id FROM answer WHERE question_id = ?) 
+                       ORDER BY ac.created_at ASC`;
+
+  db.query(sqlQuestion, [questionId], function (error, questionResults) {
     if (error) {
       res.status(500).send("서버 오류 발생: " + error.message);
       return;
@@ -95,26 +101,54 @@ router.get("/id/:questionId", function (req, res) {
       return;
     }
 
-    var studyId = questionResults[0].study_id;
+    const studyId = questionResults[0].study_id;
 
-    db.query(sqlTags, studyId, function (error, tagResults) {
+    db.query(sqlTags, [studyId], function (error, tagResults) {
       if (error) {
         res.status(500).send("서버 오류 발생: " + error.message);
         return;
       }
 
-      db.query(sqlAnswers, function (error, answerResult) {
+      db.query(sqlAnswers, [questionId], function (error, answerResults) {
         if (error) {
           res.status(500).send("서버 오류 발생: " + error.message);
           return;
         }
-        const result = {
-          question: questionResults[0],
-          tags: tagResults,
-          answers: answerResult,
-        };
 
-        return res.json(result);
+        db.query(sqlComments, [questionId], function (error, commentResults) {
+          if (error) {
+            res.status(500).send("서버 오류 발생: " + error.message);
+            return;
+          }
+
+          // 각 답변에 대해 댓글을 트리 구조로 구성
+          const commentMap = {};
+          commentResults.forEach(comment => {
+            comment.sub_comment = [];
+            commentMap[comment.answer_comment_id] = comment;
+          });
+
+          answerResults.forEach(answer => {
+            answer.comments = [];
+            commentResults.forEach(comment => {
+              if (comment.answer_id === answer.answer_id) {
+                if (comment.parent_comment_id) {
+                  commentMap[comment.parent_comment_id].sub_comment.push(comment);
+                } else {
+                  answer.comments.push(comment);
+                }
+              }
+            });
+          });
+
+          const result = {
+            question: questionResults[0],
+            tags: tagResults,
+            answers: answerResults
+          };
+
+          return res.json(result);
+        });
       });
     });
   });

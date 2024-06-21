@@ -25,6 +25,7 @@ var noticeRouter = require("./routes/notice/notice");
 var questionRouter = require("./routes/question/question");
 var answerRouter = require("./routes/answer/answer");
 var chatRouter = require("./routes/chat/chat");
+var answerCommentRouter = require("./routes/answer/answer_comment");
 
 var questionLikesRouter = require("./routes/question/question_likes");
 
@@ -71,6 +72,7 @@ app.use("/mypage/show_study", showstudyRouter);
 app.use("/question", questionRouter);
 app.use("/question/likes", questionLikesRouter);
 app.use("/answer", answerRouter);
+app.use("/answer/comment", answerCommentRouter);
 
 app.use(
   "/chat",
