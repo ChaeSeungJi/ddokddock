@@ -5,7 +5,7 @@ const db = require('../../util/db');
 
 router.use(express.urlencoded({ extended: true }));
 
-router.post('/post', (req, res) => {
+router.post('/', (req, res) => {
     const member_id = req.session.member_id;
     const { title, content, studyId } = req.body;
 
@@ -52,7 +52,7 @@ router.post('/post', (req, res) => {
 });
 
 // 공지사항 수정
-router.put('/update', (req, res) => {
+router.post('/update', (req, res) => {
     const member_id = req.session.member_id;
     const { noticeId, title, content } = req.body;
 
@@ -75,7 +75,7 @@ router.put('/update', (req, res) => {
 });
 
 // 공지사항 목록 조회
-router.get('/list', (req, res) => {
+router.post('/list', (req, res) => {
     const { sort, page, perPage } = req.query;
 
     const pageNumber = parseInt(page) || 1;
@@ -109,7 +109,7 @@ router.get('/list', (req, res) => {
 });
 
 // 삭제
-router.delete('/delete', (req, res) => {
+router.post('/delete', (req, res) => {
     const member_id = req.session.member_id;
     const noticeId = req.body.noticeId;
 
@@ -174,7 +174,7 @@ router.delete('/delete', (req, res) => {
 
 
 //검색
-router.get("/search", (req, res) => {
+router.post("/search", (req, res) => {
     const { keyword, sort } = req.query;
     let { page, perPage } = req.query;
 
@@ -222,7 +222,7 @@ router.get("/search", (req, res) => {
   });
 
 //제목만
-  router.get("/search/title", (req, res) => {
+  router.post("/search/title", (req, res) => {
     const { keyword, sort } = req.query;
     let { page, perPage } = req.query;
 

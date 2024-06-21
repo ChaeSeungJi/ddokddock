@@ -7,7 +7,7 @@ router.use(express.urlencoded({ extended: true }));
 
 
 // 개설한 스터디 보기
-router.get('/created', (req, res) => {
+router.post('/created', (req, res) => {
     const member_id = req.session.member_id;
     const { status } = req.query;
   
@@ -36,7 +36,7 @@ router.get('/created', (req, res) => {
   });
   
   // 참여한 스터디 보기
-  router.get('/joined', (req, res) => {
+  router.post('/joined', (req, res) => {
     const member_id = req.session.member_id;
     const { status } = req.query;
   

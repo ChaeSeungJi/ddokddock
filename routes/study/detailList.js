@@ -5,7 +5,7 @@ const db = require('../../util/db');
 
 router.use(express.urlencoded({ extended: true }));
 
-router.get('/', (req, res) => {
+router.post('/', (req, res) => {
   const studyId = req.query.studyId;
   
   if (!studyId) {
