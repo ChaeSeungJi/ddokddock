@@ -92,6 +92,7 @@ router.get("/id/:questionId", function (req, res) {
                        ORDER BY ac.created_at ASC`;
 
   db.query(sqlQuestion, [questionId], function (error, questionResults) {
+
     if (error) {
       res.status(500).send("서버 오류 발생: " + error.message);
       return;
@@ -109,12 +110,13 @@ router.get("/id/:questionId", function (req, res) {
         return;
       }
 
+
       db.query(sqlAnswers, [questionId], function (error, answerResults) {
+
         if (error) {
           res.status(500).send("서버 오류 발생: " + error.message);
           return;
         }
-
         db.query(sqlComments, [questionId], function (error, commentResults) {
           if (error) {
             res.status(500).send("서버 오류 발생: " + error.message);
@@ -149,6 +151,7 @@ router.get("/id/:questionId", function (req, res) {
 
           return res.json(result);
         });
+
       });
     });
   });

@@ -26,7 +26,6 @@ var questionRouter = require("./routes/question/question");
 var answerRouter = require("./routes/answer/answer");
 var chatRouter = require("./routes/chat/chat");
 var answerCommentRouter = require("./routes/answer/answer_comment");
-
 var questionLikesRouter = require("./routes/question/question_likes");
 
 var app = express();
