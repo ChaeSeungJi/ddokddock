@@ -6,6 +6,9 @@ var bodyParser = require("body-parser");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const http = require("http");
+
+const socketIo = require("socket.io"); // socket.io 가져오기
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -15,10 +18,13 @@ var listRouter = require("./routes/study/list");
 var studyRouter = require("./routes/study/study");
 var questionRouter = require("./routes/question/question");
 var answerRouter = require("./routes/answer/answer");
+var chatRouter = require("./routes/chat/chat");
 
 var questionLikesRouter = require("./routes/question/question_likes");
 
 var app = express();
+const server = http.createServer(app); // 서버 생성
+const io = socketIo(server); // socket.io 서버와 연결
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -52,6 +58,24 @@ app.use("/study", studyRouter);
 app.use("/question", questionRouter);
 app.use("/question/likes", questionLikesRouter);
 app.use("/answer", answerRouter);
+
+app.use(
+  "/chat",
+  (req, res, next) => {
+    req.io = io;
+    next();
+  },
+  chatRouter
+);
+
+// socket.io 설정
+io.on("connection", socket => {
+  console.log("New client connected");
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
 
 app.use(function (req, res, next) {
   console.log("404 Error: ", req.url);
