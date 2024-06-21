@@ -6,7 +6,7 @@ const db = require('../../util/db');
 router.use(express.urlencoded({ extended: true }));
 
 // 댓글 생성
-router.post('/post', (req, res) => {
+router.post('/', (req, res) => {
     const member_id = req.session.member_id;
     const { studyId, parentCommentId, content } = req.body;
 
@@ -33,7 +33,7 @@ router.post('/post', (req, res) => {
 });
 
 // 댓글 수정
-router.put('/update', (req, res) => {
+router.post('/update', (req, res) => {
     const member_id = req.session.member_id;
     const { commentId, content } = req.body;
 
@@ -56,7 +56,7 @@ router.put('/update', (req, res) => {
 });
 
 // 댓글 목록 조회
-router.get('/list', (req, res) => {
+router.post('/list', (req, res) => {
     const { studyId, sort, page, perPage } = req.query;
 
     if (!studyId) {
@@ -95,7 +95,7 @@ router.get('/list', (req, res) => {
 });
 
 // 댓글 삭제
-router.delete('/delete', (req, res) => {
+router.post('/delete', (req, res) => {
     const member_id = req.session.member_id;
     const commentId = req.body.commentId;
     const studyId = req.body.studyId;

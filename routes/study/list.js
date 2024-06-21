@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../../util/db");
 
-router.get("/", (req, res) => {
+router.post("/", (req, res) => {
   const { sort } = req.query;
   let { page, perPage } = req.query;
 
@@ -44,7 +44,7 @@ router.get("/", (req, res) => {
   });
 });
 
-router.get("/search", (req, res) => {
+router.post("/search", (req, res) => {
   const { keyword, sort } = req.query;
   let { page, perPage } = req.query;
 
