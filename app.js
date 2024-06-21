@@ -6,6 +6,9 @@ var bodyParser = require("body-parser");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const http = require("http");
+
+const socketIo = require("socket.io"); // socket.io 가져오기
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -14,13 +17,20 @@ var tagRouter = require("./routes/study/tag");
 var listRouter = require("./routes/study/list");
 var detailRouter = require("./routes/study/detailList");
 var chapterRouter = require("./routes/study/chapterList");
+var commentRouter = require("./routes/study/study_question");
+var profileRouter = require("./routes/mypage/profile_image");
+var showstudyRouter = require("./routes/mypage/show_study");
 var studyRouter = require("./routes/study/study");
+var noticeRouter = require("./routes/notice/notice");
 var questionRouter = require("./routes/question/question");
 var answerRouter = require("./routes/answer/answer");
-
+var chatRouter = require("./routes/chat/chat");
+var answerCommentRouter = require("./routes/answer/answer_comment");
 var questionLikesRouter = require("./routes/question/question_likes");
 
 var app = express();
+const server = http.createServer(app); // 서버 생성
+const io = socketIo(server); // socket.io 서버와 연결
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -52,11 +62,34 @@ app.use("/study/tag", tagRouter); // localhost:3000/tag
 app.use("/study/list", listRouter);
 app.use("/study/detailList", detailRouter);
 app.use("/study/chapterList", chapterRouter);
+app.use("/study/study_question", commentRouter);
+app.use("/study/study_", chapterRouter);
 app.use("/study", studyRouter);
+app.use("/mypage/profile_image", profileRouter);
+app.use("/notice/notice", noticeRouter);
+app.use("/mypage/show_study", showstudyRouter);
 app.use("/question", questionRouter);
 app.use("/question/likes", questionLikesRouter);
 app.use("/answer", answerRouter);
+app.use("/answer/comment", answerCommentRouter);
 
+app.use(
+  "/chat",
+  (req, res, next) => {
+    req.io = io;
+    next();
+  },
+  chatRouter
+);
+
+// socket.io 설정
+io.on("connection", socket => {
+  console.log("New client connected");
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
 
 app.use(function (req, res, next) {
   console.log("404 Error: ", req.url);
