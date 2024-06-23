@@ -50,4 +50,17 @@ router.post('/', (req, res) => {
   });
 });
 
+router.get("/", (req,res)=>{
+  const sql = "select * from tag";
+
+  db.query(sql, (error,results) =>{
+    if(error){
+      res.status(500).send("데이터베이스 오류 발생");
+    }
+    else{
+      res.json(results);
+    }
+  })
+})
+
 module.exports = router;

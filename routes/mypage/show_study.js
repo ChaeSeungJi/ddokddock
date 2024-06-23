@@ -9,6 +9,10 @@ router.use(express.urlencoded({ extended: true }));
 // 개설한 스터디 보기
 router.post('/created', (req, res) => {
     const member_id = req.session.member_id;
+
+    if (!member_id) {
+      return res.status(401).send("로그인이 필요합니다.");
+    }
     const { status } = req.query;
   
     let query = `
@@ -38,6 +42,11 @@ router.post('/created', (req, res) => {
   // 참여한 스터디 보기
   router.post('/joined', (req, res) => {
     const member_id = req.session.member_id;
+
+    if (!member_id) {
+      return res.status(401).send("로그인이 필요합니다.");
+    }
+
     const { status } = req.query;
   
     let query = `

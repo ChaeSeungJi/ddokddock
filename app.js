@@ -10,23 +10,6 @@ const http = require("http");
 
 const socketIo = require("socket.io"); // socket.io 가져오기
 
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
-var loginRouter = require("./routes/member/login");
-var tagRouter = require("./routes/study/tag");
-var listRouter = require("./routes/study/list");
-var detailRouter = require("./routes/study/detailList");
-var chapterRouter = require("./routes/study/chapterList");
-var commentRouter = require("./routes/study/study_question");
-var profileRouter = require("./routes/mypage/profile_image");
-var showstudyRouter = require("./routes/mypage/show_study");
-var studyRouter = require("./routes/study/study");
-var noticeRouter = require("./routes/notice/notice");
-var questionRouter = require("./routes/question/question");
-var answerRouter = require("./routes/answer/answer");
-var chatRouter = require("./routes/chat/chat");
-var answerCommentRouter = require("./routes/answer/answer_comment");
-var questionLikesRouter = require("./routes/question/question_likes");
 
 var app = express();
 const server = http.createServer(app); // 서버 생성
@@ -49,13 +32,34 @@ app.use(
   })
 );
 
-
 const cors = require('cors')
 
 let corsOptions = {
   origin: '*',      // 출처 허용 옵션
-  credential: true, // 사용자 인증이 필요한 리소스(쿠키 등) 접근
+  credentials: true, // 사용자 인증이 필요한 리소스(쿠키 등) 접근
+  methods: ['GET', 'POST'], // 허용할 HTTP 메서드
 }
+
+var indexRouter = require("./routes/index");
+var usersRouter = require("./routes/users");
+var loginRouter = require("./routes/member/login");
+var userinfoRouter = require("./routes/member/userinfo");
+var tagRouter = require("./routes/study/tag");
+var listRouter = require("./routes/study/list");
+var detailRouter = require("./routes/study/detailList");
+var chapterRouter = require("./routes/study/chapterList");
+var commentRouter = require("./routes/study/study_question");
+var profileRouter = require("./routes/mypage/profile_image");
+var showstudyRouter = require("./routes/mypage/show_study");
+var studyRouter = require("./routes/study/study");
+var noticeRouter = require("./routes/notice/notice");
+var questionRouter = require("./routes/question/question");
+var answerRouter = require("./routes/answer/answer");
+var chatRouter = require("./routes/chat/chat");
+var answerCommentRouter = require("./routes/answer/answer_comment");
+var questionLikesRouter = require("./routes/question/question_likes");
+
+
 
 app.use(cors(corsOptions))
 
@@ -68,6 +72,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/login", loginRouter);
+app.use("/userinfo", userinfoRouter);
 app.use("/study/tag", tagRouter); // localhost:3000/tag
 app.use("/study/list", listRouter);
 app.use("/study/detailList", detailRouter);
@@ -91,8 +96,6 @@ app.use(
   },
   chatRouter
 );
-
-
 
 // socket.io 설정
 io.on("connection", socket => {

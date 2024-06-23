@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../../util/db");
 
-router.post("/", (req, res) => {
+router.get("/", (req, res) => {
   const { sort } = req.query;
   let { page, perPage } = req.query;
 
