@@ -1,12 +1,34 @@
 // express 모듈과 라우터 설정
 const express = require("express");
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const db = require("../../util/db");
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'public/images/');
+  },
+  filename: function (req, file, cb) {
+      cb(null, req.session.member_id + file.originalname);
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: function (req, file, cb) {
+    if (file.fieldname === 'image_url') {
+      cb(null, true);
+    } else {
+      cb(new Error('Unexpected field'));
+    }
+  }
+});
+
 // study 생성 함수
-function createStudy(title, content, leader_id, main_subject, goals, callback) {
-  const sql = "INSERT INTO study(title, content, leader_id, created_at, main_subject, goals)  VALUES (?, ?, ?, NOW(), ? , ?)";
-  const params = [title, content, leader_id, main_subject, goals];
+function createStudy(title, content, leader_id, main_subject, goals, image_url, callback) {
+  const sql = "INSERT INTO study(title, content, leader_id, created_at, main_subject, goals, image_url)  VALUES (?, ?, ?, NOW(), ? , ?, ?)";
+  const params = [title, content, leader_id, main_subject, goals, image_url];
 
   db.query(sql, params, (error, results) => {
     if (error) return callback(error);
@@ -99,21 +121,23 @@ function deleteCurriculum(study_id, callback) {
 }
 
 // 스터디 생성
-router.post("/", (req, res) => {
-  const { title, content, curriculum, main_subject, goals, tags } = req.body;
+router.post("/", upload.single('image_url'), (req, res) => {
+  const { title, content, status, tags, main_subject, goals, curriculum } = req.body;
   const leader_id = req.session.member_id;
+  const studyImagePath = req.file ? `/images/${req.file.filename}` : null;
 
 
   if (!leader_id) {
     return res.status(401).send("로그인이 필요합니다.");
   }
 
+
   db.beginTransaction(err => {
     if (err) {
       return res.status(500).send("트랜잭션 시작 오류: " + err.message);
     }
 
-    createStudy(title, content, leader_id, main_subject, goals, (error, study_id) => {
+    createStudy(title, content, leader_id, main_subject, goals, studyImagePath, (error, study_id) => {
       if (error) {
         return db.rollback(() => {
           res.status(500).send("스터디 생성 오류: " + error.message);
@@ -240,5 +264,30 @@ router.post("/delete", function (req, res) {
     });
   });
 });
+
+router.get("/member",(req, res)=>{
+  const studyId = req.query.studyId;
+
+  const sql = `SELECT study_member_id, study_id, m.member_id, request_status, created_at, 
+    nickname, profile_image_url FROM study_member sm 
+    join member m on sm.member_id = m.member_id where sm.study_id = ${studyId}`;
+    db.query(sql, (error,results)=>{
+      if(error){
+        return res.status(500).send("서버에러" + error.message);
+      }
+      return res.status(200).json(results);
+    })
+})
+
+router.get("/tag", (req,res)=>{
+  const sql = "select * from tag";
+  db.query(sql, (error,results)=>{
+    if(error){
+      return res.status(500).send("서버에러" + error.message);
+    }
+    return res.status(200).json(results);
+  })
+
+})
 
 module.exports = router;
