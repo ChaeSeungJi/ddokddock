@@ -38,6 +38,7 @@ router.post("/", (req, res) => {
       if (results.length === 0) {
         res.status(404).json({ message: '스터디 목록이 비어 있습니다.' });
       } else {
+        console.log(results);
         res.json(results);
       }
     }

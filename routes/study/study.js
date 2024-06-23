@@ -4,9 +4,9 @@ const router = express.Router();
 const db = require("../../util/db");
 
 // study 생성 함수
-function createStudy(title, content, leader_id, callback) {
-  const sql = "INSERT INTO study VALUES (NULL, ?, ?, ?, NOW())";
-  const params = [title, content, leader_id];
+function createStudy(title, content, leader_id, main_subject, goals, callback) {
+  const sql = "INSERT INTO study(title, content, leader_id, created_at, main_subject, goals)  VALUES (?, ?, ?, NOW(), ? , ?)";
+  const params = [title, content, leader_id, main_subject, goals];
 
   db.query(sql, params, (error, results) => {
     if (error) return callback(error);
@@ -16,9 +16,9 @@ function createStudy(title, content, leader_id, callback) {
 }
 
 // study 수정 함수
-function updateStudy(studyId, title, content, callback) {
-  const sql = "update study set title = ?, content = ? where study_id = ?";
-  const params = [title, content, studyId];
+function updateStudy(studyId, title, content, main_subject, goals, callback) {
+  const sql = "update study set title = ?, content = ?, main_subject = ?, goals = ? where study_id = ?";
+  const params = [title, content, main_subject, goals, studyId];
 
   db.query(sql, params, (error, results) => {
     if (error) {
@@ -30,7 +30,19 @@ function updateStudy(studyId, title, content, callback) {
   });
 }
 
-// study 수정 함수
+function addStudyTag(tags, studyId,callback){
+  const sql = `insert into study_tag(study_id, tag_id) values(?,?)`;
+
+  tags.forEach( (item, index) => {
+    const params = [studyId, item];
+    db.query(sql, params, error => {
+      if (error) return callback(error);
+    });
+  });
+  callback(null);
+}
+
+// study 삭제 함수
 function deleteStudy(studyId, callback) {
   const sql = "delete from study where study_id = ?";
   const params = [studyId];
@@ -88,8 +100,9 @@ function deleteCurriculum(study_id, callback) {
 
 // 스터디 생성
 router.post("/", (req, res) => {
-  const { title, content, curriculum } = req.body;
+  const { title, content, curriculum, main_subject, goals, tags } = req.body;
   const leader_id = req.session.member_id;
+
 
   if (!leader_id) {
     return res.status(401).send("로그인이 필요합니다.");
@@ -100,37 +113,45 @@ router.post("/", (req, res) => {
       return res.status(500).send("트랜잭션 시작 오류: " + err.message);
     }
 
-    createStudy(title, content, leader_id, (error, study_id) => {
+    createStudy(title, content, leader_id, main_subject, goals, (error, study_id) => {
       if (error) {
         return db.rollback(() => {
           res.status(500).send("스터디 생성 오류: " + error.message);
         });
       }
 
-      addCurriculum(curriculum, study_id, error => {
-        if (error) {
-          return db.rollback(() => {
-            res.status(500).send("커리큘럼 추가 오류: " + error.message);
-          });
+      addStudyTag(tags, study_id, error => {
+        if(error){
+          return db.rollback(() =>{
+            console.log("태그 추가 오류 : "+ error.message);
+            res.status(500).send("태그 추가 오류 : "+ error.message);
+          })
         }
-
-        db.commit(err => {
-          if (err) {
+        
+        addCurriculum(curriculum, study_id, error => {
+          if (error) {
             return db.rollback(() => {
-              res.status(500).send("트랜잭션 커밋 오류: " + err.message);
+              res.status(500).send("커리큘럼 추가 오류: " + error.message);
             });
           }
-
-          res.status(200).send("스터디 생성 성공");
+          db.commit(err => {
+            if (err) {
+              return db.rollback(() => {
+                res.status(500).send("트랜잭션 커밋 오류: " + err.message);
+              });
+            }
+          });
         });
       });
     });
   });
+  res.status(200).send("스터디 생성 성공");
+
 });
 
 // 스터디 수정 localhost:3000/study/update
 router.post("/update", function (req, res) {
-  const { studyId, title, content, curriculum, leaderId } = req.body;
+  const { studyId, title, content, curriculum, leaderId, main_subject, goals } = req.body;
   const leader_id = req.session.member_id;
 
   if (!leader_id) {
@@ -146,7 +167,7 @@ router.post("/update", function (req, res) {
       return res.status(500).send("트랜잭션 시작 오류: " + err.message);
     }
 
-    updateStudy(studyId, title, content, (error, study_id) => {
+    updateStudy(studyId, title, content, main_subject, goals, (error, study_id) => {
       if (error) {
         return db.rollback(() => {
           res.status(500).send("스터디 수정 오류: " + error.message);

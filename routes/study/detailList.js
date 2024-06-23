@@ -14,7 +14,7 @@ router.post('/', (req, res) => {
   }
   
   const query = `
-    SELECT s.study_id, s.title, s.content, s.image_url, m.nickname AS leader_nickname, s.created_at
+    SELECT s.study_id, s.title, s.content, s.main_subject, s.goals, s.image_url, m.nickname AS leader_nickname, s.created_at
     FROM study s
     JOIN member m ON s.leader_id = m.member_id
     WHERE s.study_id = ?
