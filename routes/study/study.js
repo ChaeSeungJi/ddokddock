@@ -1,12 +1,34 @@
 // express 모듈과 라우터 설정
 const express = require("express");
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const db = require("../../util/db");
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'public/images/');
+  },
+  filename: function (req, file, cb) {
+      cb(null, req.session.member_id + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: function (req, file, cb) {
+    if (file.fieldname === 'image_url') {
+      cb(null, true);
+    } else {
+      cb(new Error('Unexpected field'));
+    }
+  }
+});
+
 // study 생성 함수
-function createStudy(title, content, leader_id, callback) {
-  const sql = "INSERT INTO study VALUES (NULL, ?, ?, ?, NOW())";
-  const params = [title, content, leader_id];
+function createStudy(title, content, leader_id, studyImagePath, status, callback) {
+  const sql = "INSERT INTO study (title, content, leader_id, created_at, image_url, status) VALUES (?, ?, ?, NOW(), ?, ?)";
+  const params = [title, content, leader_id, studyImagePath, status];
 
   db.query(sql, params, (error, results) => {
     if (error) return callback(error);
@@ -45,15 +67,32 @@ function deleteStudy(studyId, callback) {
 // curriculum 추가 함수
 function addCurriculum(curriculum_list, study_id, callback) {
   const sql = "INSERT INTO curriculum VALUES (NULL, ?, ?, ?)";
+  let completed = 0;
+  let hasError = false;
+
+  // 커리큘럼 리스트가 비어있는 경우
+  if (curriculum_list.length === 0) {
+    return callback(null);
+  }
 
   curriculum_list.forEach((item, index) => {
-    const params = [index + 1, item, study_id];
+    const params = [item.order, item.title, study_id];
     db.query(sql, params, error => {
-      if (error) return callback(error);
+      if (hasError) return; // 이미 에러가 발생한 경우 추가 처리 중단
+
+      if (error) {
+        hasError = true;
+        return callback(error);
+      }
+
+      completed++;
+
+      // 모든 쿼리가 완료되었는지 확인
+      if (completed === curriculum_list.length) {
+        callback(null);
+      }
     });
   });
-
-  callback(null);
 }
 
 // curriculum 수정함수
@@ -87,12 +126,28 @@ function deleteCurriculum(study_id, callback) {
 }
 
 // 스터디 생성
-router.post("/", (req, res) => {
-  const { title, content, curriculum } = req.body;
+router.post("/", upload.single('image_url'), (req, res) => {
+  const { title, content, status } = req.body;
   const leader_id = req.session.member_id;
+  const studyImagePath = req.file ? `/study_image/${req.file.filename}` : null;
 
   if (!leader_id) {
     return res.status(401).send("로그인이 필요합니다.");
+  }
+
+  let curriculumData = [];
+  if (Array.isArray(req.body.curriculum)) {
+    for (let i = 0; i < req.body.curriculum.length; i += 2) {
+      const order = req.body.curriculum[i];
+      const title = req.body.curriculum[i + 1];
+      if (order && title) {
+        curriculumData.push({ order, title });
+      }
+    }
+  }
+
+  if (curriculumData.length === 0) {
+    return res.status(400).send("커리큘럼 데이터가 비어있습니다.");
   }
 
   db.beginTransaction(err => {
@@ -100,14 +155,14 @@ router.post("/", (req, res) => {
       return res.status(500).send("트랜잭션 시작 오류: " + err.message);
     }
 
-    createStudy(title, content, leader_id, (error, study_id) => {
+    createStudy(title, content, leader_id, studyImagePath, status, (error, study_id) => {
       if (error) {
         return db.rollback(() => {
           res.status(500).send("스터디 생성 오류: " + error.message);
         });
       }
 
-      addCurriculum(curriculum, study_id, error => {
+      addCurriculum(curriculumData, study_id, error => {
         if (error) {
           return db.rollback(() => {
             res.status(500).send("커리큘럼 추가 오류: " + error.message);
@@ -127,6 +182,7 @@ router.post("/", (req, res) => {
     });
   });
 });
+
 
 // 스터디 수정 localhost:3000/study/update
 router.post("/update", function (req, res) {
