@@ -11,14 +11,14 @@ const storage = multer.diskStorage({
         cb(null, 'public/profile/');
     },
     filename: function (req, file, cb) {
-        cb(null, req.session.member_id + path.extname(file.originalname));
+        cb(null, req.body.member_id + path.extname(file.originalname));
     }
 });
 
 const upload = multer({ storage: storage });
 
 router.post('/upload', upload.single('profileImage'), (req, res) => {
-    const member_id = req.session.member_id;
+    const member_id = req.body.member_id;
     console.log("member_id:", member_id);
     const profileImagePath = `/profile_image/${req.file.filename}`;
 

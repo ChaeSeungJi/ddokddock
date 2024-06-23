@@ -6,7 +6,7 @@ const db = require('../../util/db');
 router.use(express.urlencoded({ extended: true }));
 
 router.post('/', (req, res) => {
-    const member_id = req.session.member_id;
+    const member_id = req.body.member_id;
     const { title, content, studyId } = req.body;
 
     if (!member_id) {
@@ -53,7 +53,7 @@ router.post('/', (req, res) => {
 
 // 공지사항 수정
 router.post('/update', (req, res) => {
-    const member_id = req.session.member_id;
+    const member_id = req.body.member_id;
     const { noticeId, title, content } = req.body;
 
     const query = 'UPDATE notice SET title = ?, content = ? WHERE notice_id = ? AND member_id = ?';
@@ -110,7 +110,7 @@ router.post('/list', (req, res) => {
 
 // 삭제
 router.post('/delete', (req, res) => {
-    const member_id = req.session.member_id;
+    const member_id = req.body.member_id;
     const noticeId = req.body.noticeId;
 
     if (!member_id) {

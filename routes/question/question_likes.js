@@ -5,7 +5,7 @@ const { route } = require("./question");
 
 // 좋아요 추가 / 제거
 router.post("/:questionId", function (req, res) {
-  const member_id = req.session.member_id;
+  const member_id = req.body.member_id;
   if (!member_id) {
     res.status(400).send("로그인 후 사용해주세요");
     return;

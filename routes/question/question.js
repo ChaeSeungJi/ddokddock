@@ -4,7 +4,7 @@ var db = require("../../util/db");
 
 // 질문 생성
 router.post("/", function (req, res) {
-  const member_id = req.session.member_id;
+  const member_id = req.body.member_id;
   const { title, content, studyId } = req.body;
 
   if (!member_id) {
@@ -29,7 +29,7 @@ router.post("/", function (req, res) {
 
 // 질문 수정하기
 router.post("/update", function (req, res) {
-  const member_id = req.session.member_id;
+  const member_id = req.body.member_id;
   const { questionId, title, content, memberId, studyId } = req.body;
 
   if (memberId != member_id) {
@@ -53,7 +53,7 @@ router.post("/update", function (req, res) {
 
 // 질문 삭제하기
 router.post("/delete", function (req, res) {
-  const member_id = req.session.member_id;
+  const member_id = req.body.member_id;
   const questionId = req.body.questionId;
   const memberId = req.body.memberId;
 
@@ -157,34 +157,43 @@ router.get("/id/:questionId", function (req, res) {
   });
 });
 
+
 // 질문 목록 불러오기 (제목 검색)
 router.get("/list", function (req, res) {
-  var { keyword, tagId, sort, page, perPage } = req.query; //페이징처리
+  var { keyword, tagId, sort, page, perPage } = req.query;
 
-  if (!page || !perPage) {
-    page = 1;
-    perPage = 10;
-  }
+  // 기본값 설정
+  page = page ? parseInt(page, 10) : 1;
+  perPage = perPage ? parseInt(perPage, 10) : 10;
   const offset = (page - 1) * perPage;
 
+  // 기본 SQL 쿼리
   var sql = `
-  select q.question_id, q.title, q.content, q.study_id, 
-  q.created_at, m.member_id, m.nickname, count(l.question_likes_id) as 'likes_count'
-  from question q 
-  join member m on q.member_id = m.member_id 
-  left join question_likes l on q.question_id = l.question_id `;
+    select q.question_id, q.title, q.content, q.study_id, 
+    q.created_at, m.member_id, m.nickname, count(l.question_likes_id) as 'likes_count'
+    from question q 
+    join member m on q.member_id = m.member_id 
+    left join question_likes l on q.question_id = l.question_id 
+  `;
+  var params = [];
 
+  // 태그 필터링
   if (tagId) {
-    sql += `left join study_tag st on q.study_id = st.study_id where st.tag_id = ${tagId} `;
+    sql += `left join study_tag st on q.study_id = st.study_id where st.tag_id = ? `;
+    params.push(tagId);
+
     if (keyword) {
-      sql += `and q.title like '%${keyword}%' `;
+      sql += `and q.title like ? `;
+      params.push(`%${keyword}%`);
     }
   } else {
     if (keyword) {
-      sql += `where q.title like '%${keyword}%' `;
+      sql += `where q.title like ? `;
+      params.push(`%${keyword}%`);
     }
   }
 
+  // 그룹화 및 정렬
   sql += "group by q.question_id ";
 
   if (sort === "latest") {
@@ -193,16 +202,52 @@ router.get("/list", function (req, res) {
     sql += ` ORDER BY q.created_at ASC `;
   }
 
-  sql += ` LIMIT ${offset}, ${perPage} `;
+  // 페이징 처리
+  sql += ` LIMIT ?, ? `;
+  params.push(offset, perPage);
 
-  db.query(sql, (error, results) => {
+  // 데이터베이스 쿼리 실행
+  db.query(sql, params, (error, questions) => {
     if (error) {
       console.error("검색 중 오류 발생:", error);
-      res.status(500).json({ error: "검색 중 오류가 발생했습니다." });
-    } else {
-      res.json(results);
+      return res.status(500).json({ error: "검색 중 오류가 발생했습니다." });
     }
+
+    if (questions.length === 0) {
+      return res.json([]);
+    }
+
+    const questionIds = questions.map(q => q.study_id);
+    const tagQuery = `
+    SELECT st.study_id, t.tag_id, t.tag_name
+    FROM study_tag st
+    JOIN tag t ON t.tag_id = st.tag_id
+    WHERE st.study_id IN (?)
+`;
+
+    db.query(tagQuery, [questionIds], (tagError, tags) => {
+      if (tagError) {
+        console.error("태그 조회 중 오류 발생:", tagError);
+        return res.status(500).json({ error: "태그 조회 중 오류가 발생했습니다." });
+      }
+
+      const tagMap = tags.reduce((acc, tag) => {
+        if (!acc[tag.study_id]) {
+          acc[tag.study_id] = [];
+        }
+        acc[tag.study_id].push({ tag_id: tag.tag_id, tag_name: tag.tag_name });
+        return acc;
+      }, {});
+
+      const results = questions.map(question => ({
+        ...question,
+        tags: tagMap[question.study_id] || []
+      }));
+
+      res.json(results);
+    });
   });
 });
+
 
 module.exports = router;

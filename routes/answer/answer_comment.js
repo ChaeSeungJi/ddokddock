@@ -4,7 +4,7 @@ const db = require("../../util/db");
 
 
 router.post('/',(req,res)=>{
-    const member_id = req.session.member_id;
+    const member_id = req.body.member_id;
     const {answerId, parentCommentId, content} = req.body;
 
     if(!member_id){
@@ -35,7 +35,7 @@ router.post('/',(req,res)=>{
 
 
 router.post('/update',(req,res)=>{
-    const member_id = req.session.member_id;
+    const member_id = req.body.member_id;
     const {commentId, content} = req.body;
 
     var sql = "update answer_comment set content = ? where answer_comment_id = ? and member_id = ?";
@@ -57,7 +57,7 @@ router.post('/update',(req,res)=>{
 
 
 router.post('/delete', (req,res)=>{
-    const member_id = req.session.member_id;
+    const member_id = req.body.member_id;
     const commentId = req.body.commentId;
 
     var sql = "delete from answer_comment where answer_comment_id = ? and member_id =?";

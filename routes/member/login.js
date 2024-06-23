@@ -12,6 +12,8 @@ router.post("/", function (req, res) {
   var login_id = req.body.loginid;
   var password = req.body.password;
 
+  console.log(req.body);
+
   var sql = "select * from member where login_id = ? and password = ?";
   var params = [login_id, password];
 
@@ -21,9 +23,10 @@ router.post("/", function (req, res) {
       return;
     }
     if (results.length > 0) {
-      res.send(results);
       req.session.member_id = results[0].member_id;
       req.session.save(); // save를 해줘야 세션에 저장됨.
+      console.log("test : "+ req.session.member_id);
+      return res.status(200).send(results);
     } else {
       res.send("로그인 실패");
     }

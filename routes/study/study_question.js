@@ -7,7 +7,7 @@ router.use(express.urlencoded({ extended: true }));
 
 // 댓글 생성
 router.post('/', (req, res) => {
-    const member_id = req.session.member_id;
+    const member_id = req.body.member_id;
     const { studyId, parentCommentId, content } = req.body;
 
     if (!member_id) {
@@ -34,7 +34,7 @@ router.post('/', (req, res) => {
 
 // 댓글 수정
 router.post('/update', (req, res) => {
-    const member_id = req.session.member_id;
+    const member_id = req.body.member_id;
     const { commentId, content } = req.body;
 
     const query = 'UPDATE study_comment SET content = ? WHERE comment_id = ? AND member_id = ?';
@@ -96,7 +96,7 @@ router.post('/list', (req, res) => {
 
 // 댓글 삭제
 router.post('/delete', (req, res) => {
-    const member_id = req.session.member_id;
+    const member_id = req.body.member_id;
     const commentId = req.body.commentId;
     const studyId = req.body.studyId;
 

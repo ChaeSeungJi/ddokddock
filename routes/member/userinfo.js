@@ -3,8 +3,8 @@ var router = express.Router();
 var db = require("../../util/db");
 
 
-router.get("/", (req,res)=>{
-    const member_id = req.session.member_id;
+router.post("/", (req,res)=>{
+    const member_id = req.body.member_id;
 
     console.log(member_id);
 

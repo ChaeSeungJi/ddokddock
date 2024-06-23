@@ -4,7 +4,7 @@ const db = require("../../util/db");
 
 // 답변 생성하기
 router.post("/", (req, res) => {
-  const member_id = req.session.member_id;
+  const member_id = req.body.member_id;
   const questionId = req.body.questionId;
   const content = req.body.content;
 
@@ -27,7 +27,7 @@ router.post("/", (req, res) => {
 
 // 답변 수정하기
 router.post("/update", (req, res) => {
-  const member_id = req.session.member_id;
+  const member_id = req.body.member_id;
   const answerId = req.body.answerId;
   const content = req.body.content;
   const memberId = req.body.memberId;
@@ -55,7 +55,7 @@ router.post("/update", (req, res) => {
 
 // 답변 삭제하기
 router.post("/delete", function (req, res) {
-  const member_id = req.session.member_id;
+  const member_id = req.body.member_id;
   const answerId = req.body.answerId;
   const memberId = req.body.memberId;
 
@@ -84,7 +84,7 @@ router.post("/delete", function (req, res) {
 
 // 좋아요 추가 / 제거
 router.post("/likes/:answerId", function (req, res) {
-  const member_id = req.session.member_id;
+  const member_id = req.body.member_id;
   if (!member_id) {
     res.status(400).send("로그인 후 사용해주세요");
     return;

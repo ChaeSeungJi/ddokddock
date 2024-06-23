@@ -31,7 +31,7 @@ router.post('/', (req, res) => {
 
   db.query(query, [studyId, offset, parseInt(perPage)], (error, results) => {
     if (error) {
-      console.error('커리큘럼 조회 중 오류 발생:', error);
+      console.error('커리큘럼 조회 중 오류 발생:', error.message);
       res.status(500).json({ error: '커리큘럼 조회 중 오류가 발생했습니다.' });
     } else {
       res.json(results);

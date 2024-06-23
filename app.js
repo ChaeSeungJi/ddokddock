@@ -7,6 +7,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const http = require("http");
+const cors = require('cors')
 
 const socketIo = require("socket.io"); // socket.io 가져오기
 
@@ -32,13 +33,13 @@ app.use(
   })
 );
 
-const cors = require('cors')
 
 let corsOptions = {
   origin: '*',      // 출처 허용 옵션
   credentials: true, // 사용자 인증이 필요한 리소스(쿠키 등) 접근
   methods: ['GET', 'POST'], // 허용할 HTTP 메서드
 }
+app.use(cors(corsOptions));
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -61,7 +62,6 @@ var questionLikesRouter = require("./routes/question/question_likes");
 
 
 
-app.use(cors(corsOptions))
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -81,7 +81,7 @@ app.use("/study/study_question", commentRouter);
 app.use("/study/study_", chapterRouter);
 app.use("/study", studyRouter);
 app.use("/mypage/profile_image", profileRouter);
-app.use("/notice/notice", noticeRouter);
+app.use("/notice", noticeRouter);
 app.use("/mypage/show_study", showstudyRouter);
 app.use("/question", questionRouter);
 app.use("/question/likes", questionLikesRouter);
